@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-HK" lang="zh-HK" prefix="og: http://ogp.me/ns#">
+<head>
+<title></title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+</head>
+<style>
+        *{margin:0;padding:0}
+        #calendar{width:210px;margin:100px auto; overflow:hidden;border:1px solid #000; padding:20px; position:relative}
+        #calendar h4{ text-align:center; margin-bottom:10px;}
+        #calendar .a1{ position:absolute;top:20px;left:20px;}
+        #calendar .a2{ position:absolute;top:20px;right:20px;}
+        #calendar .week{height:30px; line-height:20px;border-bottom:1px solid #000; margin-bottom:10px;}
+        #calendar .week li{ float:left;width:30px;height:30px;text-align:center;list-style:none;}
+        #calendar .dateList{ overflow:hidden; clear:both}
+        #calendar .dateList li{float:left;width:30px;height:30px; text-align:center;line-height:30px;list-style:none;}
+        #calendar .dateList .ccc{ color:#ccc;}
+        #calendar .dateList .red{ background:#F90; color:#fff;}
+        #calendar .dateList .sun{ color:#f00;}
+        .clickColor{width:100px;height:100px;background:#f00;}
+</style>
+<body>
+<div id="app">
+    <div id="calendar">
+        <h4>{{year}}年{{month}}月{{day}}日</h4>
+        <a class="a1" id="prev" @click="prev">上月</a>
+        <a class="a2" id="next" @click="next">下月</a>
+        <ul class="week">
+            <li>日</li>
+            <li>一</li>
+            <li>二</li>
+            <li>三</li>
+            <li>四</li>
+            <li>五</li>
+            <li>六</li>
+        </ul>
+        <ul class="dateList" id="dateList">    
+            <li v-for="item in preMonth" style="color: #ccc;">{{item}}</li>
+            <li v-for="item in currMonth" :style="day==item&&month==new Date().getMonth()+1&&year==new Date().getFullYear()?'background:red;border-radius:100%;color:white':''">{{item}}</li>
+            <li v-for="item in nextMonth" style="color: #ccc;">{{item}}</li>
+        </ul>
+  </div>
+</div>
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+var app = new Vue({
+  el: '#app',
+  data: {
+    time:new Date(),
+    year:"",
+    month:"",
+    day:"",
+    week:"",
+    month0:["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"],
+    month1:["29","30","31"],
+    month2:["29","30"],
+    month3:["29"],
+    month4:[],
+    currMonth:[],
+    preMonth:[],
+    nextMonth:[],
+  },
+  mounted(){
+   this.date()
+  },
+  methods:{
+    date(){
+     this.year=this.time.getFullYear()
+     this.month=this.time.getMonth()+1
+     this.day=this.time.getDate()
+     this.months(this.month)
+     this.currMonth=this.month4
+     this.oneDay(this.year,this.month,1)
+     this.changeMonth()
+    },
+    prev(){
+        this.month=this.month==1?12:this.month-1
+        this.year=this.month==12?this.year-1:this.year
+        this.oneDay(this.year,this.month,1)
+        this.months(this.month)
+        this.currMonth=this.month4
+        this.changeMonth()
+    },
+    next(){
+        this.month=this.month==12?1:this.month+1
+        this.year=this.month==1?this.year+1:this.year
+        this.oneDay(this.year,this.month,1)
+        this.months(this.month)
+        this.currMonth=this.month4
+        this.changeMonth()
+    },
+    months(month){
+        if(month==1||month==3||month==5||month==7||month==8||month==10||month==12){
+            this.month4=this.month0.concat(this.month1)
+        }
+        if(month==4||month==6||month==9||month==11){
+            this.month4=this.month0.concat(this.month2)
+        }
+        if(month==2){
+            if(this.year%4==0){
+                this.month4=this.month0.concat(this.month3)
+            }else{
+                this.month4=this.month0
+            }
+        }
+    },
+    changeMonth(){
+     this.months(this.month-1)
+     this.preMonth=this.month4.slice(this.month4.length-this.week,this.month4.length)
+     this.months(this.month+1)
+     if(this.preMonth.length+this.currMonth.length>35){
+        this.nextMonth=this.month4.slice(0,42-this.preMonth.length-this.currMonth.length)
+     }else{
+        this.nextMonth=this.month4.slise(0,35-this.preMonth.length-this.currMonth.length)
+     }
+    },
+    oneDay(y,m,d){ 
+     this.time.setFullYear(y,m-1,d);
+     this.week = this.time.getDay()
+    }
+  }
+})
+</script>
